@@ -1,0 +1,35 @@
+import type { TrafficGraph } from "@/types/trafficGraph";
+
+export const trafficGraph: TrafficGraph = {
+  nodes: [
+    { id: "A1", name: "North District", x: 18, y: 14 },
+    { id: "A2", name: "North East", x: 68, y: 12 },
+    { id: "B1", name: "Central North", x: 38, y: 32 },
+    { id: "B2", name: "Central Hub", x: 56, y: 50 },
+    { id: "B3", name: "Central East", x: 78, y: 35 },
+    { id: "C1", name: "South West", x: 18, y: 76 },
+    { id: "C2", name: "South", x: 49, y: 78 },
+    { id: "C3", name: "South East", x: 82, y: 76 },
+    { id: "D1", name: "West District", x: 8, y: 48 },
+    { id: "D2", name: "East District", x: 93, y: 48 },
+    { id: "E1", name: "Industrial Zone", x: 28, y: 56 },
+  ],
+  edges: [
+    { id: "R-01", source: "A1", target: "A2", distance: 4.2, condition: "normal", trafficMultiplier: 1 },
+    { id: "R-02", source: "A1", target: "B1", distance: 3.1, condition: "moderate", trafficMultiplier: 1.25 },
+    { id: "R-03", source: "A2", target: "B3", distance: 3.8, condition: "normal", trafficMultiplier: 1 },
+    { id: "R-04", source: "B1", target: "B2", distance: 2.4, condition: "heavy", trafficMultiplier: 1.65 },
+    { id: "R-05", source: "B1", target: "E1", distance: 3.6, condition: "moderate", trafficMultiplier: 1.25 },
+    { id: "R-06", source: "B2", target: "B3", distance: 2.9, condition: "normal", trafficMultiplier: 1 },
+    { id: "R-07", source: "B2", target: "C2", distance: 4.5, condition: "moderate", trafficMultiplier: 1.25 },
+    { id: "R-08", source: "B2", target: "E1", distance: 2.2, condition: "normal", trafficMultiplier: 1 },
+    { id: "R-09", source: "B3", target: "D2", distance: 3.4, condition: "heavy", trafficMultiplier: 1.65 },
+    { id: "R-10", source: "B3", target: "C3", distance: 4.1, condition: "normal", trafficMultiplier: 1 },
+    { id: "R-11", source: "D1", target: "B1", distance: 4.7, condition: "normal", trafficMultiplier: 1 },
+    { id: "R-12", source: "D1", target: "E1", distance: 2.8, condition: "heavy", trafficMultiplier: 1.65 },
+    { id: "R-13", source: "E1", target: "C1", distance: 3.9, condition: "moderate", trafficMultiplier: 1.25 },
+    { id: "R-14", source: "C1", target: "C2", distance: 3.2, condition: "normal", trafficMultiplier: 1 },
+    { id: "R-15", source: "C2", target: "C3", distance: 3.5, condition: "moderate", trafficMultiplier: 1.25 },
+    { id: "R-16", source: "C3", target: "D2", distance: 3.7, condition: "normal", trafficMultiplier: 1 },
+  ],
+};

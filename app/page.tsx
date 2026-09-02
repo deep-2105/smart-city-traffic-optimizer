@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import CityTrafficNetwork from "@/components/CityTrafficNetwork";
+import type { GraphNode } from "@/types/trafficGraph";
 
 const navigation = [
   ["01", "Dashboard", "▦"], ["02", "City Network", "⌘"], ["03", "Route Optimization", "↗"],
@@ -22,17 +24,17 @@ const trafficLevels = [
 
 const algorithms = [["BFS / DFS", "Network traversal", "Ready"], ["Dijkstra", "Shortest path", "Ready"], ["Prim / Kruskal", "Minimum spanning tree", "Planned"]] as const;
 
-function NetworkMap() {
-  const nodes = [["north", "12%", "16%", "A1"], ["east", "84%", "20%", "B4"], ["west", "20%", "67%", "C2"], ["south", "75%", "79%", "D7"], ["center", "52%", "46%", "HQ"], ["midwest", "37%", "30%", "E3"], ["mideast", "71%", "51%", "F9"]] as const;
-  return <div className="network-canvas" aria-label="Illustrative city road network"><div className="map-grid" /><svg className="road-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M12 16 L37 30 L52 46 L71 51 L84 20" /><path d="M20 67 L37 30 L52 46 L75 79" /><path d="M12 16 L20 67" /><path d="M52 46 L84 20" /><path className="road-highlight" d="M20 67 L37 30 L52 46 L71 51" /></svg>{nodes.map(([name, left, top, id]) => <div className={`network-node node-${name}`} style={{ left, top }} key={name}><span>{id}</span></div>)}<div className="map-label label-north">North District</div><div className="map-label label-central">Central Hub</div><div className="map-label label-south">South Loop</div><div className="map-legend"><span className="legend-line" /> Active route <span className="legend-dot" /> Network node</div></div>;
-}
-
 export default function Home() {
   const [activePage, setActivePage] = useState("Dashboard");
-  const [source, setSource] = useState("Central Hub");
-  const [destination, setDestination] = useState("North District");
+  const [source, setSource] = useState<GraphNode | null>(null);
+  const [destination, setDestination] = useState<GraphNode | null>(null);
   const [objective, setObjective] = useState("Fastest route");
   const [routeMessage, setRouteMessage] = useState("");
+  const handleSelectionChange = (selectedSource: GraphNode | null, selectedDestination: GraphNode | null) => {
+    setSource(selectedSource);
+    setDestination(selectedDestination);
+    setRouteMessage("");
+  };
 
   return (
     <div className="dashboard-shell">
@@ -104,8 +106,7 @@ export default function Home() {
                   </div>
                   <button className="outline-button">Full network <span>↗</span></button>
                 </div>
-                <NetworkMap />
-                <div className="network-footer"><span><i className="pulse" /> Live network data</span><span>1,284 nodes <b>·</b> 2,461 connections</span></div>
+                <CityTrafficNetwork onSelectionChange={handleSelectionChange} />
               </article>
               <article className="panel conditions-panel">
                 <div className="panel-heading">
@@ -140,19 +141,11 @@ export default function Home() {
                 </div>
                 <div className="route-form">
                   <label>Source
-                    <select value={source} onChange={(event) => setSource(event.target.value)}>
-                      <option>Central Hub</option>
-                      <option>West Terminal</option>
-                      <option>South Loop</option>
-                    </select>
+                    <div className="route-selection">{source ? `${source.id} · ${source.name}` : "Select on network"}</div>
                   </label>
                   <span className="swap">⇄</span>
                   <label>Destination
-                    <select value={destination} onChange={(event) => setDestination(event.target.value)}>
-                      <option>North District</option>
-                      <option>East Market</option>
-                      <option>Airport Link</option>
-                    </select>
+                    <div className="route-selection">{destination ? `${destination.id} · ${destination.name}` : "Select on network"}</div>
                   </label>
                   <label>Optimization objective
                     <select value={objective} onChange={(event) => setObjective(event.target.value)}>
@@ -161,7 +154,7 @@ export default function Home() {
                       <option>Lowest congestion</option>
                     </select>
                   </label>
-                  <button className="route-button" onClick={() => setRouteMessage(`${objective} from ${source} to ${destination} is ready for analysis.`)}>Find optimal route <span>→</span></button>
+                  <button className="route-button" disabled={!source || !destination} onClick={() => { if (source && destination) setRouteMessage(`${objective} from ${source.name} to ${destination.name} is ready for analysis.`); }}>Find optimal route <span>→</span></button>
                 </div>
                 {routeMessage && <p className="route-message" role="status">{routeMessage}</p>}
               </article>
