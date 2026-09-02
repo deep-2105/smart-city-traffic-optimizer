@@ -6,6 +6,8 @@ import type { GraphEdge, GraphNode } from "@/types/trafficGraph";
 
 type CityTrafficNetworkProps = {
   onSelectionChange: (source: GraphNode | null, destination: GraphNode | null) => void;
+  visitedNodeIds: Set<string>;
+  currentNodeId: string | null;
 };
 
 const conditionLabels = { normal: "Normal", moderate: "Moderate", heavy: "Heavy" } as const;
@@ -20,7 +22,7 @@ function getConnectedEdges(nodeId: string): GraphEdge[] {
   return trafficGraph.edges.filter((edge) => edge.source === nodeId || edge.target === nodeId);
 }
 
-export default function CityTrafficNetwork({ onSelectionChange }: CityTrafficNetworkProps) {
+export default function CityTrafficNetwork({ onSelectionChange, visitedNodeIds, currentNodeId }: CityTrafficNetworkProps) {
   const [source, setSource] = useState<GraphNode | null>(null);
   const [destination, setDestination] = useState<GraphNode | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
@@ -62,7 +64,7 @@ export default function CityTrafficNetwork({ onSelectionChange }: CityTrafficNet
         })}
     </svg>
     <div className="network-node-layer">
-      {trafficGraph.nodes.map((node) => <button type="button" className={`network-node ${selectedNode?.id === node.id ? "node-selected" : ""} ${source?.id === node.id ? "node-source" : ""} ${destination?.id === node.id ? "node-destination" : ""}`} style={{ left: `${node.x}%`, top: `${node.y}%` }} onClick={() => selectNode(node)} key={node.id} aria-label={`Select ${node.id}, ${node.name}`}><span>{node.id}</span></button>)}
+      {trafficGraph.nodes.map((node) => <button type="button" className={`network-node ${selectedNode?.id === node.id ? "node-selected" : ""} ${source?.id === node.id ? "node-source" : ""} ${destination?.id === node.id ? "node-destination" : ""} ${visitedNodeIds.has(node.id) ? "node-visited" : ""} ${currentNodeId === node.id ? "node-current" : ""}`} style={{ left: `${node.x}%`, top: `${node.y}%` }} onClick={() => selectNode(node)} key={node.id} aria-label={`Select ${node.id}, ${node.name}`}><span>{node.id}</span></button>)}
       </div>
       <div className="map-label label-north">North District</div><div className="map-label label-central">Central Hub</div><div className="map-label label-south">South Network</div>
       <div className="map-legend"><span className="legend-key normal" /> Normal <span className="legend-key moderate" /> Moderate <span className="legend-key heavy" /> Heavy</div>
