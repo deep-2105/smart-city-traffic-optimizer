@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { dijkstra, type DijkstraResult } from "@/algorithms/dijkstra";
 import { bfs, dfs } from "@/algorithms/traversal";
 import CityTrafficNetwork from "@/components/CityTrafficNetwork";
 import { trafficGraph } from "@/data/trafficGraph";
@@ -30,8 +31,7 @@ export default function Home() {
   const [activePage, setActivePage] = useState("Dashboard");
   const [source, setSource] = useState<GraphNode | null>(null);
   const [destination, setDestination] = useState<GraphNode | null>(null);
-  const [objective, setObjective] = useState("Fastest route");
-  const [routeMessage, setRouteMessage] = useState("");
+  const [routeResult, setRouteResult] = useState<DijkstraResult | null>(null);
   const [traversalStart, setTraversalStart] = useState("A1");
   const [traversalAlgorithm, setTraversalAlgorithm] = useState<"BFS" | "DFS">("BFS");
   const [traversalSteps, setTraversalSteps] = useState<string[]>([]);
@@ -72,10 +72,34 @@ export default function Home() {
     setCurrentNodeId(null);
     setTraversalStatus("Ready to run");
   };
+
   const handleSelectionChange = (selectedSource: GraphNode | null, selectedDestination: GraphNode | null) => {
     setSource(selectedSource);
     setDestination(selectedDestination);
-    setRouteMessage("");
+    setRouteResult(null);
+  };
+
+  const selectRouteNode = (role: "source" | "destination", nodeId: string) => {
+    const node = trafficGraph.nodes.find((graphNode) => graphNode.id === nodeId) ?? null;
+    if (role === "source") {
+      handleSelectionChange(node, destination);
+      return;
+    }
+    handleSelectionChange(source, node);
+  };
+
+  const swapRouteEndpoints = () => {
+    handleSelectionChange(destination, source);
+  };
+
+  const resetNetworkSelection = () => {
+    handleSelectionChange(null, null);
+    resetTraversal();
+  };
+
+  const findOptimalRoute = () => {
+    if (!source || !destination) return;
+    setRouteResult(dijkstra(trafficGraph, source.id, destination.id));
   };
 
   return (
@@ -148,7 +172,7 @@ export default function Home() {
                   </div>
                   <button className="outline-button">Full network <span>↗</span></button>
                 </div>
-                <CityTrafficNetwork onSelectionChange={handleSelectionChange} visitedNodeIds={visitedNodeIds} currentNodeId={currentNodeId} />
+                <CityTrafficNetwork source={source} destination={destination} onSelectionChange={handleSelectionChange} onResetSelection={resetNetworkSelection} visitedNodeIds={visitedNodeIds} currentNodeId={currentNodeId} routeNodeIds={routeResult?.path ?? []} />
               </article>
               <article className="panel conditions-panel">
                 <div className="panel-heading">
@@ -198,22 +222,41 @@ export default function Home() {
                 </div>
                 <div className="route-form">
                   <label>Source
-                    <div className="route-selection">{source ? `${source.id} · ${source.name}` : "Select on network"}</div>
-                  </label>
-                  <span className="swap">⇄</span>
-                  <label>Destination
-                    <div className="route-selection">{destination ? `${destination.id} · ${destination.name}` : "Select on network"}</div>
-                  </label>
-                  <label>Optimization objective
-                    <select value={objective} onChange={(event) => setObjective(event.target.value)}>
-                      <option>Fastest route</option>
-                      <option>Shortest distance</option>
-                      <option>Lowest congestion</option>
+                    <select className="route-selection" value={source?.id ?? ""} onChange={(event) => selectRouteNode("source", event.target.value)}>
+                      <option value="">Select on network</option>
+                      {trafficGraph.nodes.map((node) => <option value={node.id} key={node.id}>{node.id} · {node.name}</option>)}
                     </select>
                   </label>
-                  <button className="route-button" disabled={!source || !destination} onClick={() => { if (source && destination) setRouteMessage(`${objective} from ${source.name} to ${destination.name} is ready for analysis.`); }}>Find optimal route <span>→</span></button>
+                  <button className="swap" type="button" onClick={swapRouteEndpoints} disabled={!source || !destination} aria-label="Swap source and destination" title="Swap source and destination">⇄</button>
+                  <label>Destination
+                    <select className="route-selection" value={destination?.id ?? ""} onChange={(event) => selectRouteNode("destination", event.target.value)}>
+                      <option value="">Select on network</option>
+                      {trafficGraph.nodes.map((node) => <option value={node.id} key={node.id}>{node.id} · {node.name}</option>)}
+                    </select>
+                  </label>
+                  <label>Optimization objective
+                    <select value="Fastest route" disabled aria-label="Optimization objective">
+                      <option>Fastest route</option>
+                    </select>
+                  </label>
+                  <button className="route-button" type="button" disabled={!source || !destination} onClick={findOptimalRoute}>Find optimal route <span>→</span></button>
                 </div>
-                {routeMessage && <p className="route-message" role="status">{routeMessage}</p>}
+                {routeResult && <div className="route-result" role="status">
+                  {routeResult.reachable ? <>
+                    <div className="route-result-heading"><strong>Optimal Route</strong><span>Algorithm: Dijkstra</span></div>
+                    {source?.id === destination?.id && <p className="route-message">Source and destination are the same. This route has zero distance.</p>}
+                    <dl className="route-metrics">
+                      <div><dt>Source</dt><dd>{source?.id} · {source?.name}</dd></div>
+                      <div><dt>Destination</dt><dd>{destination?.id} · {destination?.name}</dd></div>
+                      <div><dt>Total distance</dt><dd>{routeResult.totalDistance?.toFixed(1)} km</dd></div>
+                      <div><dt>Nodes in route</dt><dd>{routeResult.path.length}</dd></div>
+                      <div><dt>Nodes visited</dt><dd>{routeResult.visitedCount}</dd></div>
+                    </dl>
+                    <div className="route-path"><span>Nodes in route</span><p>{routeResult.path.join(" → ")}</p></div>
+                  </> : <><div className="route-result-heading"><strong>No route available</strong><span>Algorithm: Dijkstra</span></div><p className="route-message">No connected route exists between the selected intersections.</p></>}
+                  <p className="dijkstra-explanation">Dijkstra&apos;s algorithm finds the shortest weighted path from a source node to a destination node by repeatedly selecting the closest unvisited node and relaxing its neighboring edges.</p>
+                  <p className="dijkstra-complexity">Time: O((V + E) log V) · Space: O(V)</p>
+                </div>}
               </article>
               <article className="panel algorithms-panel">
                 <div className="panel-heading">
