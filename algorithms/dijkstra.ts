@@ -3,10 +3,13 @@ import type { TrafficGraph } from "@/types/trafficGraph";
 export type DijkstraResult = {
   path: string[];
   totalDistance: number | null;
+  totalCost: number | null;
   visitedNodeIds: string[];
   visitedCount: number;
   reachable: boolean;
 };
+
+export type DijkstraCostMode = "distance" | "traffic";
 
 type QueueEntry = {
   nodeId: string;
@@ -62,7 +65,7 @@ class MinHeap {
   }
 }
 
-export function dijkstra(graph: TrafficGraph, startNodeId: string, destinationNodeId: string): DijkstraResult {
+export function dijkstra(graph: TrafficGraph, startNodeId: string, destinationNodeId: string, costMode: DijkstraCostMode = "distance"): DijkstraResult {
   const nodeIds = new Set(graph.nodes.map((node) => node.id));
   if (!nodeIds.has(startNodeId)) throw new Error(`Unknown Dijkstra start node: ${startNodeId}`);
   if (!nodeIds.has(destinationNodeId)) throw new Error(`Unknown Dijkstra destination node: ${destinationNodeId}`);
@@ -88,7 +91,8 @@ export function dijkstra(graph: TrafficGraph, startNodeId: string, destinationNo
       const neighborId = edge.source === current.nodeId ? edge.target : edge.target === current.nodeId ? edge.source : null;
       if (!neighborId || finalized.has(neighborId)) continue;
 
-      const candidateDistance = current.distance + edge.distance;
+      const edgeCost = costMode === "traffic" ? edge.distance * edge.trafficMultiplier : edge.distance;
+      const candidateDistance = current.distance + edgeCost;
       if (candidateDistance >= (distances.get(neighborId) ?? Number.POSITIVE_INFINITY)) continue;
 
       distances.set(neighborId, candidateDistance);
@@ -97,9 +101,9 @@ export function dijkstra(graph: TrafficGraph, startNodeId: string, destinationNo
     }
   }
 
-  const totalDistance = distances.get(destinationNodeId) ?? Number.POSITIVE_INFINITY;
-  if (!Number.isFinite(totalDistance)) {
-    return { path: [], totalDistance: null, visitedNodeIds, visitedCount: visitedNodeIds.length, reachable: false };
+  const totalCost = distances.get(destinationNodeId) ?? Number.POSITIVE_INFINITY;
+  if (!Number.isFinite(totalCost)) {
+    return { path: [], totalDistance: null, totalCost: null, visitedNodeIds, visitedCount: visitedNodeIds.length, reachable: false };
   }
 
   const path: string[] = [];
@@ -107,5 +111,11 @@ export function dijkstra(graph: TrafficGraph, startNodeId: string, destinationNo
     path.unshift(nodeId);
   }
 
-  return { path, totalDistance, visitedNodeIds, visitedCount: visitedNodeIds.length, reachable: true };
+  const totalDistance = path.slice(1).reduce((distance, nodeId, index) => {
+    const previousNodeId = path[index];
+    const edge = graph.edges.find((item) => (item.source === previousNodeId && item.target === nodeId) || (item.target === previousNodeId && item.source === nodeId));
+    return distance + (edge?.distance ?? 0);
+  }, 0);
+
+  return { path, totalDistance, totalCost, visitedNodeIds, visitedCount: visitedNodeIds.length, reachable: true };
 }

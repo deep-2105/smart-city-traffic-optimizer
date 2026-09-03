@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { dijkstra, type DijkstraResult } from "@/algorithms/dijkstra";
+import { dijkstra, type DijkstraCostMode, type DijkstraResult } from "@/algorithms/dijkstra";
 import { bfs, dfs } from "@/algorithms/traversal";
 import CityTrafficNetwork from "@/components/CityTrafficNetwork";
 import { trafficGraph } from "@/data/trafficGraph";
@@ -27,10 +27,13 @@ const trafficLevels = [
 
 const algorithms = [["BFS / DFS", "Network traversal", "Ready"], ["Dijkstra", "Shortest path", "Ready"], ["Prim / Kruskal", "Minimum spanning tree", "Planned"]] as const;
 
+type RouteObjective = "Fastest route" | "Shortest distance";
+
 export default function Home() {
   const [activePage, setActivePage] = useState("Dashboard");
   const [source, setSource] = useState<GraphNode | null>(null);
   const [destination, setDestination] = useState<GraphNode | null>(null);
+  const [objective, setObjective] = useState<RouteObjective>("Fastest route");
   const [routeResult, setRouteResult] = useState<DijkstraResult | null>(null);
   const [traversalStart, setTraversalStart] = useState("A1");
   const [traversalAlgorithm, setTraversalAlgorithm] = useState<"BFS" | "DFS">("BFS");
@@ -97,9 +100,15 @@ export default function Home() {
     resetTraversal();
   };
 
+  const changeRouteObjective = (nextObjective: RouteObjective) => {
+    setObjective(nextObjective);
+    setRouteResult(null);
+  };
+
   const findOptimalRoute = () => {
     if (!source || !destination) return;
-    setRouteResult(dijkstra(trafficGraph, source.id, destination.id));
+    const costMode: DijkstraCostMode = objective === "Fastest route" ? "traffic" : "distance";
+    setRouteResult(dijkstra(trafficGraph, source.id, destination.id, costMode));
   };
 
   return (
@@ -235,8 +244,9 @@ export default function Home() {
                     </select>
                   </label>
                   <label>Optimization objective
-                    <select value="Fastest route" disabled aria-label="Optimization objective">
+                    <select value={objective} onChange={(event) => changeRouteObjective(event.target.value as RouteObjective)} aria-label="Optimization objective">
                       <option>Fastest route</option>
+                      <option>Shortest distance</option>
                     </select>
                   </label>
                   <button className="route-button" type="button" disabled={!source || !destination} onClick={findOptimalRoute}>Find optimal route <span>→</span></button>
@@ -248,13 +258,16 @@ export default function Home() {
                     <dl className="route-metrics">
                       <div><dt>Source</dt><dd>{source?.id} · {source?.name}</dd></div>
                       <div><dt>Destination</dt><dd>{destination?.id} · {destination?.name}</dd></div>
+                      <div><dt>Optimization</dt><dd>{objective}</dd></div>
                       <div><dt>Total distance</dt><dd>{routeResult.totalDistance?.toFixed(1)} km</dd></div>
+                      {objective === "Fastest route" && <div><dt>Traffic-adjusted cost</dt><dd>{routeResult.totalCost?.toFixed(2)}</dd></div>}
                       <div><dt>Nodes in route</dt><dd>{routeResult.path.length}</dd></div>
                       <div><dt>Nodes visited</dt><dd>{routeResult.visitedCount}</dd></div>
                     </dl>
                     <div className="route-path"><span>Nodes in route</span><p>{routeResult.path.join(" → ")}</p></div>
                   </> : <><div className="route-result-heading"><strong>No route available</strong><span>Algorithm: Dijkstra</span></div><p className="route-message">No connected route exists between the selected intersections.</p></>}
-                  <p className="dijkstra-explanation">Dijkstra&apos;s algorithm finds the shortest weighted path from a source node to a destination node by repeatedly selecting the closest unvisited node and relaxing its neighboring edges.</p>
+                  {objective === "Fastest route" && <p className="route-message">Fastest route uses road distance weighted by current traffic conditions.</p>}
+                  <p className="dijkstra-explanation">Dijkstra&apos;s algorithm finds the shortest weighted path from a source node to a destination node by repeatedly selecting the closest unvisited node and relaxing its neighboring edges. Shortest distance uses road distance as the edge weight; fastest route uses road distance × traffic multiplier.</p>
                   <p className="dijkstra-complexity">Time: O((V + E) log V) · Space: O(V)</p>
                 </div>}
               </article>
