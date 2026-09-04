@@ -12,6 +12,7 @@ type CityTrafficNetworkProps = {
   visitedNodeIds: Set<string>;
   currentNodeId: string | null;
   routeNodeIds: readonly string[];
+  mstEdgeIds: readonly string[];
 };
 
 const conditionLabels = { normal: "Normal", moderate: "Moderate", heavy: "Heavy" } as const;
@@ -26,7 +27,7 @@ function getConnectedEdges(nodeId: string): GraphEdge[] {
   return trafficGraph.edges.filter((edge) => edge.source === nodeId || edge.target === nodeId);
 }
 
-export default function CityTrafficNetwork({ source, destination, onSelectionChange, onResetSelection, visitedNodeIds, currentNodeId, routeNodeIds }: CityTrafficNetworkProps) {
+export default function CityTrafficNetwork({ source, destination, onSelectionChange, onResetSelection, visitedNodeIds, currentNodeId, routeNodeIds, mstEdgeIds }: CityTrafficNetworkProps) {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
 
   const selectNode = (node: GraphNode) => {
@@ -56,7 +57,8 @@ export default function CityTrafficNetwork({ source, destination, onSelectionCha
           const targetNode = getNode(edge.target);
           const isConnected = selectedNode && (edge.source === selectedNode.id || edge.target === selectedNode.id);
           const isRouteEdge = routeNodeIds.some((nodeId, index) => index > 0 && ((routeNodeIds[index - 1] === edge.source && nodeId === edge.target) || (routeNodeIds[index - 1] === edge.target && nodeId === edge.source)));
-          return <g className={`road road-${edge.condition} ${isConnected ? "road-selected" : ""} ${isRouteEdge ? "road-route" : ""}`} key={edge.id}>
+          const isMstEdge = mstEdgeIds.includes(edge.id);
+          return <g className={`road road-${edge.condition} ${mstEdgeIds.length > 0 ? "road-mst-context" : ""} ${isConnected ? "road-selected" : ""} ${isMstEdge ? "road-mst" : ""} ${isRouteEdge ? "road-route" : ""}`} key={edge.id}>
             <line x1={sourceNode.x} y1={sourceNode.y} x2={targetNode.x} y2={targetNode.y} />
             <text x={(sourceNode.x + targetNode.x) / 2} y={(sourceNode.y + targetNode.y) / 2 - 1.5}>{edge.distance} km</text>
           </g>;
