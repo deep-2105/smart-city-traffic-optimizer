@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { dijkstra, type DijkstraCostMode, type DijkstraResult } from "@/algorithms/dijkstra";
+import { kruskalMST, primMST, type MSTAlgorithm, type MSTResult } from "@/algorithms/mst";
 import { bfs, dfs } from "@/algorithms/traversal";
 import CityTrafficNetwork from "@/components/CityTrafficNetwork";
 import { trafficGraph } from "@/data/trafficGraph";
@@ -25,8 +26,6 @@ const trafficLevels = [
   { label: "Heavy", count: "47 roads", percent: "3%", color: "red" },
 ] as const;
 
-const algorithms = [["BFS / DFS", "Network traversal", "Ready"], ["Dijkstra", "Shortest path", "Ready"], ["Prim / Kruskal", "Minimum spanning tree", "Planned"]] as const;
-
 type RouteObjective = "Fastest route" | "Shortest distance";
 
 export default function Home() {
@@ -35,6 +34,8 @@ export default function Home() {
   const [destination, setDestination] = useState<GraphNode | null>(null);
   const [objective, setObjective] = useState<RouteObjective>("Fastest route");
   const [routeResult, setRouteResult] = useState<DijkstraResult | null>(null);
+  const [mstAlgorithm, setMstAlgorithm] = useState<MSTAlgorithm>("Prim");
+  const [mstResult, setMstResult] = useState<MSTResult | null>(null);
   const [traversalStart, setTraversalStart] = useState("A1");
   const [traversalAlgorithm, setTraversalAlgorithm] = useState<"BFS" | "DFS">("BFS");
   const [traversalSteps, setTraversalSteps] = useState<string[]>([]);
@@ -97,6 +98,7 @@ export default function Home() {
 
   const resetNetworkSelection = () => {
     handleSelectionChange(null, null);
+    setMstResult(null);
     resetTraversal();
   };
 
@@ -109,6 +111,15 @@ export default function Home() {
     if (!source || !destination) return;
     const costMode: DijkstraCostMode = objective === "Fastest route" ? "traffic" : "distance";
     setRouteResult(dijkstra(trafficGraph, source.id, destination.id, costMode));
+  };
+
+  const calculateMst = () => {
+    setMstResult(mstAlgorithm === "Prim" ? primMST(trafficGraph) : kruskalMST(trafficGraph));
+  };
+
+  const changeMstAlgorithm = (nextAlgorithm: MSTAlgorithm) => {
+    setMstAlgorithm(nextAlgorithm);
+    setMstResult(null);
   };
 
   return (
@@ -181,7 +192,7 @@ export default function Home() {
                   </div>
                   <button className="outline-button">Full network <span>↗</span></button>
                 </div>
-                <CityTrafficNetwork source={source} destination={destination} onSelectionChange={handleSelectionChange} onResetSelection={resetNetworkSelection} visitedNodeIds={visitedNodeIds} currentNodeId={currentNodeId} routeNodeIds={routeResult?.path ?? []} />
+                <CityTrafficNetwork source={source} destination={destination} onSelectionChange={handleSelectionChange} onResetSelection={resetNetworkSelection} visitedNodeIds={visitedNodeIds} currentNodeId={currentNodeId} routeNodeIds={routeResult?.path ?? []} mstEdgeIds={mstResult?.selectedEdgeIds ?? []} />
               </article>
               <article className="panel conditions-panel">
                 <div className="panel-heading">
@@ -271,24 +282,36 @@ export default function Home() {
                   <p className="dijkstra-complexity">Time: O((V + E) log V) · Space: O(V)</p>
                 </div>}
               </article>
-              <article className="panel algorithms-panel">
+              <article className="panel infrastructure-panel">
                 <div className="panel-heading">
                   <div>
-                    <p className="panel-kicker">SYSTEM MODULES</p>
-                    <h2>Algorithms</h2>
+                    <p className="panel-kicker">INFRASTRUCTURE PLANNING</p>
+                    <h2>Minimum Spanning Tree</h2>
                   </div>
-                  <span className="module-count">03</span>
+                  <span className={`mst-status ${mstResult ? "mst-calculated" : ""}`}>{mstResult ? "MST calculated" : "Ready to calculate"}</span>
                 </div>
-                <div className="algorithm-list">
-                  {algorithms.map(([name, detail, status]) => (
-                    <div className="algorithm-row" key={name}>
-                      <span className="algorithm-symbol">{name === "Dijkstra" ? "◈" : name === "BFS / DFS" ? "⌘" : "◇"}</span>
-                      <span><strong>{name}</strong><small>{detail}</small></span>
-                      <b className={status === "Planned" ? "planned" : "ready"}>{status}</b>
-                    </div>
-                  ))}
+                <p className="infrastructure-copy">Find the minimum-distance road network that connects every intersection.</p>
+                <div className="mst-controls">
+                  <label>Algorithm
+                    <select value={mstAlgorithm} onChange={(event) => changeMstAlgorithm(event.target.value as MSTAlgorithm)}>
+                      <option value="Prim">Prim</option>
+                      <option value="Kruskal">Kruskal</option>
+                    </select>
+                  </label>
+                  <button className="route-button" type="button" onClick={calculateMst}>Calculate MST <span>→</span></button>
                 </div>
-                <p className="algorithm-note">Core modules will connect to the network engine.</p>
+                {mstResult && <div className="mst-result" role="status">
+                  <dl className="mst-metrics">
+                    <div><dt>Algorithm</dt><dd>{mstResult.algorithm}</dd></div>
+                    <div><dt>Total infrastructure distance</dt><dd>{mstResult.totalDistance.toFixed(1)} km</dd></div>
+                    <div><dt>Roads selected</dt><dd>{mstResult.edgesSelected} / {Math.max(trafficGraph.nodes.length - 1, 0)}</dd></div>
+                    <div><dt>Intersections connected</dt><dd>{mstResult.nodesConnected} / {trafficGraph.nodes.length}</dd></div>
+                    <div><dt>Network status</dt><dd className={mstResult.isConnected ? "mst-connected" : "mst-disconnected"}>{mstResult.isConnected ? "Connected" : "Disconnected"}</dd></div>
+                  </dl>
+                  <div className="mst-roads"><span>Selected roads</span>{mstResult.selectedEdges.length > 0 ? <ul>{mstResult.selectedEdges.map((edge) => <li key={edge.id}>{edge.source} — {edge.target} <small>{edge.distance} km</small></li>)}</ul> : <p>No roads are required.</p>}</div>
+                  <p className="mst-explanation"><strong>Prim</strong> grows from a starting node using the cheapest expansion edge. <strong>Kruskal</strong> sorts roads by distance and adds the cheapest edge that does not create a cycle. Both produce a minimum spanning tree for a connected weighted graph.</p>
+                  <p className="dijkstra-complexity">Prim: O((V + E) log V) · Kruskal: O(E log E) · Space: O(V + E)</p>
+                </div>}
               </article>
             </section>
             <footer>
