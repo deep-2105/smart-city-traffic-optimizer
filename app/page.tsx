@@ -5,8 +5,9 @@ import { dijkstra, type DijkstraCostMode, type DijkstraResult } from "@/algorith
 import { kruskalMST, primMST, type MSTAlgorithm, type MSTResult } from "@/algorithms/mst";
 import { bfs, dfs } from "@/algorithms/traversal";
 import CityTrafficNetwork from "@/components/CityTrafficNetwork";
+import TrafficAnalysis from "@/components/TrafficAnalysis";
 import { trafficGraph } from "@/data/trafficGraph";
-import type { GraphNode } from "@/types/trafficGraph";
+import type { GraphEdge, GraphNode } from "@/types/trafficGraph";
 
 const navigation = [
   ["01", "Dashboard", "▦"], ["02", "City Network", "⌘"], ["03", "Route Optimization", "↗"],
@@ -20,12 +21,6 @@ const stats = [
   { label: "Active Routes", value: "9,842", unit: "", detail: "+8.7% this month", tone: "violet", icon: "⌁" },
 ] as const;
 
-const trafficLevels = [
-  { label: "Normal", count: "842 roads", percent: "66%", color: "green" },
-  { label: "Moderate", count: "395 roads", percent: "31%", color: "amber" },
-  { label: "Heavy", count: "47 roads", percent: "3%", color: "red" },
-] as const;
-
 type RouteObjective = "Fastest route" | "Shortest distance";
 
 export default function Home() {
@@ -36,6 +31,7 @@ export default function Home() {
   const [routeResult, setRouteResult] = useState<DijkstraResult | null>(null);
   const [mstAlgorithm, setMstAlgorithm] = useState<MSTAlgorithm>("Prim");
   const [mstResult, setMstResult] = useState<MSTResult | null>(null);
+  const [focusedTrafficRoadId, setFocusedTrafficRoadId] = useState<string | null>(null);
   const [traversalStart, setTraversalStart] = useState("A1");
   const [traversalAlgorithm, setTraversalAlgorithm] = useState<"BFS" | "DFS">("BFS");
   const [traversalSteps, setTraversalSteps] = useState<string[]>([]);
@@ -99,6 +95,7 @@ export default function Home() {
   const resetNetworkSelection = () => {
     handleSelectionChange(null, null);
     setMstResult(null);
+    setFocusedTrafficRoadId(null);
     resetTraversal();
   };
 
@@ -192,29 +189,9 @@ export default function Home() {
                   </div>
                   <button className="outline-button">Full network <span>↗</span></button>
                 </div>
-                <CityTrafficNetwork source={source} destination={destination} onSelectionChange={handleSelectionChange} onResetSelection={resetNetworkSelection} visitedNodeIds={visitedNodeIds} currentNodeId={currentNodeId} routeNodeIds={routeResult?.path ?? []} mstEdgeIds={mstResult?.selectedEdgeIds ?? []} />
+                <CityTrafficNetwork source={source} destination={destination} onSelectionChange={handleSelectionChange} onResetSelection={resetNetworkSelection} visitedNodeIds={visitedNodeIds} currentNodeId={currentNodeId} routeNodeIds={routeResult?.path ?? []} mstEdgeIds={mstResult?.selectedEdgeIds ?? []} focusedRoadId={focusedTrafficRoadId} />
               </article>
-              <article className="panel conditions-panel">
-                <div className="panel-heading">
-                  <div>
-                    <p className="panel-kicker">CURRENT SNAPSHOT</p>
-                    <h2>Traffic Conditions</h2>
-                  </div>
-                  <span className="trend">↗ 6.2%</span>
-                </div>
-                <div className="condition-total"><strong>1,284</strong><span>monitored roads</span></div>
-                <div className="condition-list">
-                  {trafficLevels.map((level) => (
-                    <div className="condition-row" key={level.label}>
-                      <div className="condition-title">
-                        <span className={`condition-dot ${level.color}`} />{level.label}<small>{level.count}</small><b>{level.percent}</b>
-                      </div>
-                      <div className="condition-bar"><span className={level.color} style={{ width: level.percent }} /></div>
-                    </div>
-                  ))}
-                </div>
-                <div className="condition-note"><span>!</span> 3 roads require immediate attention</div>
-              </article>
+              <TrafficAnalysis graph={trafficGraph} focusedRoadId={focusedTrafficRoadId} onRoadSelect={(road: GraphEdge) => setFocusedTrafficRoadId(road.id)} />
             </section>
             <section className="traversal-panel panel">
               <div className="panel-heading">
