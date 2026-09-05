@@ -5,6 +5,7 @@ import { dijkstra, type DijkstraCostMode, type DijkstraResult } from "@/algorith
 import { kruskalMST, primMST, type MSTAlgorithm, type MSTResult } from "@/algorithms/mst";
 import { bfs, dfs } from "@/algorithms/traversal";
 import CityTrafficNetwork from "@/components/CityTrafficNetwork";
+import DecisionSupport from "@/components/DecisionSupport";
 import PerformanceAnalysis from "@/components/PerformanceAnalysis";
 import TrafficAnalysis from "@/components/TrafficAnalysis";
 import { trafficGraph } from "@/data/trafficGraph";
@@ -13,6 +14,7 @@ import type { GraphEdge, GraphNode } from "@/types/trafficGraph";
 const navigation = [
   ["01", "Dashboard", "▦"], ["02", "City Network", "⌘"], ["03", "Route Optimization", "↗"],
   ["04", "Traffic Analysis", "◒"], ["05", "Infrastructure Planning", "⌂"], ["06", "Performance", "↗"],
+  ["07", "Decision Support", "🛡"],
 ] as const;
 
 const stats = [
@@ -122,7 +124,9 @@ export default function Home() {
 
   const handleNavClick = (label: string) => {
     setActivePage(label);
-    if (label === "Performance") {
+    if (label === "Decision Support") {
+      document.getElementById("decision-support")?.scrollIntoView({ behavior: "smooth" });
+    } else if (label === "Performance") {
       document.getElementById("performance-analysis")?.scrollIntoView({ behavior: "smooth" });
     } else if (label === "City Network") {
       document.querySelector(".network-panel")?.scrollIntoView({ behavior: "smooth" });
@@ -310,6 +314,7 @@ export default function Home() {
               </article>
             </section>
             <PerformanceAnalysis graph={trafficGraph} />
+            <DecisionSupport graph={trafficGraph} source={source} destination={destination} mstResult={mstResult} />
             <footer>
               <span>SMART CITY TRAFFIC MANAGEMENT SYSTEM</span>
               <span>Built for better movement <b>·</b> <strong>UrbanGrid Labs</strong></span>
