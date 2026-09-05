@@ -73,6 +73,117 @@ button, select { font: inherit; }
 .performance-module-mapping strong { color: #2caaa0; }
 .performance-insights p { color: #667d85; font-size: 9px; line-height: 1.6; margin: 0 0 6px; }
 .performance-disclaimer { color: #9aaab0 !important; font-style: italic; }
+
+/* Decision Support Styles */
+.decision-support-panel { margin-top: 17px; margin-bottom: 17px; }
+.decision-status { color: #879aa0; font-size: 9px; }
+.decision-status i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #5de1d1; margin-right: 5px; }
+
+.decision-summary-card { background: #f8fafb; border: 1px solid #dfe8ea; border-top: 3px solid #2caaa0; padding: 14px 16px; margin-bottom: 18px; }
+.decision-summary-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #edf1f2; padding-bottom: 8px; margin-bottom: 12px; }
+.decision-summary-header strong { color: #263945; font-size: 13px; font-weight: 600; }
+.decision-summary-header span { color: #91a1a7; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.decision-summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.summary-item { background: #fff; border: 1px solid #edf1f2; padding: 10px 12px; }
+.summary-label { display: block; color: #80929b; font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.summary-text { color: #344c56; font-size: 10px; font-weight: 500; line-height: 1.5; margin: 0; }
+
+.decision-layout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.decision-subpanel { background: #fafcfd; border: 1px solid #edf1f2; padding: 16px; }
+.subpanel-header { display: flex; justify-content: space-between; align-items: center; }
+.subpanel-header h3 { color: #293d47; font-size: 13px; font-weight: 600; margin: 0; }
+.subpanel-tag { font-size: 8px; font-weight: 600; padding: 2px 6px; border-radius: 3px; background: #eefaf6; color: #2caaa0; }
+.admin-tag { background: #eff6fc; color: #3b7bb5; }
+.subpanel-subtitle { color: #82959d; font-size: 9.5px; margin: 3px 0 14px; }
+
+.decision-placeholder { background: #fff; border: 1px dashed #dbe5e8; padding: 24px 16px; text-align: center; color: #91a1a7; font-size: 10px; font-style: italic; }
+.commuter-content { display: flex; flex-direction: column; gap: 12px; }
+.recommended-route-box { background: #fff; border: 1px solid #e0eceb; border-left: 3px solid #2caaa0; padding: 12px; }
+.box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.box-header strong { color: #2caaa0; font-size: 11px; }
+.rec-tag { background: #eefaf6; color: #2caaa0; font-size: 8px; font-weight: 600; padding: 2px 6px; border-radius: 3px; }
+.route-endpoints-info { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; font-size: 9px; }
+.route-endpoints-info span { display: block; color: #91a1a7; font-size: 8px; }
+.route-endpoints-info strong { display: block; color: #344c56; margin-top: 2px; }
+.rec-path-line { background: #f4faf9; padding: 6px 10px; border-radius: 3px; font-size: 9.5px; color: #2c7b74; }
+.rec-path-line span { color: #7f979c; margin-right: 6px; }
+
+.recommendation-rules-box { display: flex; flex-direction: column; gap: 6px; }
+.rule-msg { margin: 0; font-size: 9.5px; line-height: 1.5; padding: 8px 10px; border-radius: 3px; }
+.rule-msg.primary { background: #effaf6; color: #2a7e74; border-left: 2px solid #2caaa0; }
+.rule-msg.secondary { background: #fdf8ee; color: #a07530; border-left: 2px solid #e3b35f; }
+
+.commuter-alert-banner { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 9.5px; border-radius: 3px; }
+.commuter-alert-banner p { margin: 0; }
+.alert-icon { display: inline-grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+.alert-heavy { background: #fdf3f0; color: #c45d46; border: 1px solid #f9ded7; }
+.alert-heavy .alert-icon { background: #c45d46; color: #fff; }
+.alert-moderate { background: #fdf8ee; color: #af7a2e; border: 1px solid #f6e8cc; }
+.alert-moderate .alert-icon { background: #af7a2e; color: #fff; }
+.alert-normal { background: #f4faf9; color: #398d78; border: 1px solid #d8f0ea; }
+.alert-normal .alert-icon { background: #398d78; color: #fff; }
+
+.route-comparison-card { background: #fff; border: 1px solid #edf1f2; padding: 12px; }
+.route-comparison-card h4 { color: #344c56; font-size: 11px; font-weight: 600; margin: 0 0 8px; }
+.comparison-table { width: 100%; border-collapse: collapse; font-size: 9.5px; text-align: left; margin-bottom: 8px; }
+.comparison-table th { background: #f8fafb; color: #78909a; font-size: 8.5px; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #edf1f2; }
+.comparison-table td { padding: 6px 8px; border-bottom: 1px solid #edf1f2; color: #526871; }
+.comparison-note-text { color: #78909a; font-size: 9px; font-style: italic; margin: 0; }
+
+.admin-sections-list { display: flex; flex-direction: column; gap: 14px; }
+.admin-block { background: #fff; border: 1px solid #edf1f2; padding: 12px; }
+.admin-block h4 { color: #293d47; font-size: 11px; font-weight: 600; margin: 0 0 6px; }
+.admin-action-text { color: #344c56; font-size: 9.5px; font-weight: 500; margin: 0 0 8px; }
+.top-road-badge { background: #fff7f3; border-left: 2px solid #c45d46; padding: 6px 10px; font-size: 9px; display: flex; flex-direction: column; gap: 2px; }
+.top-road-badge span { color: #80929b; font-size: 8px; }
+.top-road-badge strong { color: #c45d46; }
+.top-road-badge small { color: #82959d; }
+
+.mst-decision-box { display: flex; flex-direction: column; gap: 8px; }
+.mst-summary-msg { color: #344c56; font-size: 9.5px; margin: 0; line-height: 1.5; }
+.mst-mini-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: #fdf9f2; border: 1px solid #f6e8cc; padding: 6px 8px; margin: 0; font-size: 8.5px; }
+.mst-mini-metrics dt { color: #a58f6c; }
+.mst-mini-metrics dd { color: #5f6664; font-weight: 600; margin: 2px 0 0; }
+.no-mst-msg { color: #91a1a7; font-size: 9.5px; font-style: italic; margin: 0; }
+
+.network-cond-msg { color: #344c56; font-size: 9.5px; margin: 0 0 8px; }
+.admin-traffic-breakdown { display: flex; gap: 12px; font-size: 9px; color: #80929b; }
+.admin-traffic-breakdown strong { font-weight: 600; }
+
+.priority-score-section { border-top: 1px solid #edf1f2; padding-top: 16px; margin-bottom: 16px; }
+.priority-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; }
+.priority-header h3 { color: #293d47; font-size: 13px; font-weight: 600; margin: 0 0 4px; }
+.priority-explanation { color: #78909a; font-size: 9px; margin: 0; max-width: 750px; line-height: 1.5; }
+.priority-tag { background: #fdf3f0; color: #c45d46; font-size: 8px; font-weight: 600; padding: 3px 8px; border-radius: 3px; }
+
+.priority-table-wrap { overflow-x: auto; border: 1px solid #edf1f2; }
+.priority-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 9.5px; }
+.priority-table th { background: #f8fafb; color: #617780; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 12px; border-bottom: 1px solid #dfe8ea; }
+.priority-table td { padding: 8px 12px; border-bottom: 1px solid #edf1f2; color: #485f69; vertical-align: middle; }
+.priority-table tr:last-child td { border-bottom: 0; }
+.rank-cell { font-weight: 700; color: #c45d46; width: 40px; }
+.road-id-cell strong { color: #293d47; }
+.score-cell strong { color: #c45d46; font-size: 11px; }
+.condition-badge { display: inline-block; padding: 2px 6px; font-size: 8px; font-weight: 600; border-radius: 3px; }
+.condition-heavy { background: #fdf3f0; color: #c45d46; }
+.condition-moderate { background: #fdf8ee; color: #af7a2e; }
+.condition-normal { background: #eefaf6; color: #398d78; }
+
+.decision-footer-notes { border-top: 1px solid #edf1f2; padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.decision-methodology { color: #526871; font-size: 9px; line-height: 1.5; margin: 0; }
+.decision-methodology strong { color: #2caaa0; }
+.decision-disclaimer { color: #9aaab0; font-size: 8.5px; font-style: italic; line-height: 1.5; margin: 0; }
+
+@media (max-width: 1000px) {
+  .decision-summary-grid { grid-template-columns: 1fr 1fr; }
+  .decision-layout-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .decision-summary-grid { grid-template-columns: 1fr; }
+  .route-endpoints-info { grid-template-columns: 1fr 1fr; }
+  .mst-mini-metrics { grid-template-columns: 1fr 1fr; }
+  .admin-traffic-breakdown { flex-wrap: wrap; gap: 8px; }
+}
 footer { display: flex; justify-content: space-between; color: #9aaab0; font-size: 8px; padding: 5px 2px 0; } footer strong { color: #6f858d; font-weight: 600; }
 @media (max-width: 1000px) { .sidebar { width: 205px; }.route-form { grid-template-columns: 1fr 1fr; }.route-button { grid-column: span 2; }.swap { left: calc(50% - 9px); } }
 @media (max-width: 720px) { .dashboard-shell { display: block; }.sidebar { width: 100%; padding: 15px; }.brand { padding: 0 4px 16px; }.workspace-label, .sidebar-bottom { display: none; }.sidebar nav { display: flex; overflow-x: auto; gap: 4px; }.nav-item { min-width: max-content; padding: 9px; }.nav-number { display: none; }.topbar { height: 60px; padding: 0 18px; }.header-time { display: none; }.topbar-actions { gap: 12px; }.content-wrap { padding: 28px 18px 20px; }.intro { align-items: start; margin-bottom: 24px; }.refresh-info { display: none; }.stats-grid { grid-template-columns: 1fr 1fr; }.stat-card { padding: 15px; }.stat-value { font-size: 25px; }.dashboard-grid, .lower-grid { grid-template-columns: 1fr; }.panel { padding: 18px 16px; }.network-canvas { height: 245px; }.route-form { grid-template-columns: 1fr; }.route-button { grid-column: auto; }.swap { display: none; }.route-metrics, .mst-metrics { grid-template-columns: 1fr; }.mst-roads ul { columns: 1; }.traffic-summary-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }.traffic-summary-metrics div:nth-child(4) { border-left: 0; border-top: 1px solid #edf1f2; }.traffic-summary-metrics div:nth-child(5) { border-top: 1px solid #edf1f2; } footer { gap: 8px; line-height: 1.5; } }
