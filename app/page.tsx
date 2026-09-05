@@ -5,6 +5,7 @@ import { dijkstra, type DijkstraCostMode, type DijkstraResult } from "@/algorith
 import { kruskalMST, primMST, type MSTAlgorithm, type MSTResult } from "@/algorithms/mst";
 import { bfs, dfs } from "@/algorithms/traversal";
 import CityTrafficNetwork from "@/components/CityTrafficNetwork";
+import PerformanceAnalysis from "@/components/PerformanceAnalysis";
 import TrafficAnalysis from "@/components/TrafficAnalysis";
 import { trafficGraph } from "@/data/trafficGraph";
 import type { GraphEdge, GraphNode } from "@/types/trafficGraph";
@@ -119,6 +120,23 @@ export default function Home() {
     setMstResult(null);
   };
 
+  const handleNavClick = (label: string) => {
+    setActivePage(label);
+    if (label === "Performance") {
+      document.getElementById("performance-analysis")?.scrollIntoView({ behavior: "smooth" });
+    } else if (label === "City Network") {
+      document.querySelector(".network-panel")?.scrollIntoView({ behavior: "smooth" });
+    } else if (label === "Route Optimization") {
+      document.querySelector(".route-panel")?.scrollIntoView({ behavior: "smooth" });
+    } else if (label === "Traffic Analysis") {
+      document.querySelector(".traffic-analysis-panel")?.scrollIntoView({ behavior: "smooth" });
+    } else if (label === "Infrastructure Planning") {
+      document.querySelector(".infrastructure-panel")?.scrollIntoView({ behavior: "smooth" });
+    } else if (label === "Dashboard") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="dashboard-shell">
         <aside className="sidebar">
@@ -129,7 +147,7 @@ export default function Home() {
           <div className="workspace-label">CONTROL CENTER <span>v2.4.0</span></div>
           <nav aria-label="Main navigation">
             {navigation.map(([number, label, icon]) => (
-              <button className={`nav-item ${activePage === label ? "active" : ""}`} onClick={() => setActivePage(label)} key={label}>
+              <button className={`nav-item ${activePage === label ? "active" : ""}`} onClick={() => handleNavClick(label)} key={label}>
                 <span className="nav-number">{number}</span>
                 <span className="nav-icon">{icon}</span>
                 <span>{label}</span>
@@ -291,6 +309,7 @@ export default function Home() {
                 </div>}
               </article>
             </section>
+            <PerformanceAnalysis graph={trafficGraph} />
             <footer>
               <span>SMART CITY TRAFFIC MANAGEMENT SYSTEM</span>
               <span>Built for better movement <b>·</b> <strong>UrbanGrid Labs</strong></span>
