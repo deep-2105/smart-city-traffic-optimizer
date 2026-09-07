@@ -332,6 +332,17 @@ The current graph also derives 11 intersections, 16 roads, 8 normal roads, 5 mod
 | Semester | [Semester] |
 | Project | Smart City Traffic Management and Route Optimization System |
 
+## Documentation
+
+- [Testing and Validation](docs/TESTING.md)
+- [Results and Observations](docs/RESULTS.md)
+- [Algorithm Reference](docs/ALGORITHMS.md)
+- [System Architecture](docs/ARCHITECTURE.md)
+
+## Evidence
+
+Implementation screenshots and evaluation evidence are maintained in `docs/screenshots/` when captured from the application. The directory currently contains no screenshots.
+
 ## License and Academic Use
 
 This repository is maintained as an academic capstone project. Add institutional licensing or submission metadata here if required by the course or department.
